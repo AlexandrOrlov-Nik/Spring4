@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Users</title>
+</head>
+
+<body>
+
+<p>Table Users</p>
+
+<div th:each="user : ${users}">
+    <a th:href="@{/usera/{id}(id=${user.getId()})}" th:text="${user.getName()}">User</a>
+</div>
+
+<a href="/table/usersTableSave">Save Table</a>
+
+<p th:text="${name}" />
+</body>
+
+</html>
