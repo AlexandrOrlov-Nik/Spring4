@@ -9,7 +9,7 @@ import java.util.List;
 @Component
 public class UserDAO {
     private static int USER_COUNT;
-    private List<User> users;
+    private final List<User> users;
 
     {
         users = new ArrayList<>();
@@ -27,5 +27,19 @@ public class UserDAO {
     public void save(User user) {
         user.setId(++USER_COUNT);
         users.add(user);
+    }
+
+    public void update(User user) {
+        for (User u : users) {
+            if (u.getId() == user.getId()) {
+                u.setName(user.getName());
+            break;
+            }
+        }
+    }
+
+
+    public void delete(int id) {
+        users.removeIf(user -> user.getId() == id);
     }
 }

@@ -2,10 +2,13 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>user</title>
+    <title>User</title>
 </head>
 <body>
-<p th:text="${users.getName()}">VALUE</p>
-<p th:text="${users.getId()}">VALUE</p>
+<p>ID: <span th:text="${user.id}">VALUE</span></p>
+<p>Name: <span th:text="${user.name}">VALUE</span></p>
+
+<a href="/table/v1/users">Back to Users List</a>
+
 </body>
 </html>

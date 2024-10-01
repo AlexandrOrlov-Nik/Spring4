@@ -1,22 +1,20 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-
 <head>
-    <meta charset="ISO-8859-1">
+    <meta charset="UTF-8">
     <title>Users</title>
 </head>
-
 <body>
 
-<p>Table Users</p>
+<h1>Table User</h1>
 
 <div th:each="user : ${users}">
-    <a th:href="@{/usera/{id}(id=${user.getId()})}" th:text="${user.getName()}">User</a>
+    <a th:href="@{/table/v1/{id}(id=${user.getId()})}" th:text="${user.getName()}">User</a>
+    <a th:href="@{/table/v1/edit/{id}(id=${user.getId()})}">Edit</a> <!-- Ссылка на редактирование -->
+    <a th:href="@{/table/v1/delete/{id}(id=${user.getId()})}" th:onclick="'return confirm(\'Are you sure?\');'">Delete</a> <!-- Ссылка на удаление с подтверждением -->
 </div>
 
-<a href="/table/usersTableSave">Save Table</a>
+<a href="/table/v1/newUser">New User</a>
 
-<p th:text="${name}" />
 </body>
-
 </html>

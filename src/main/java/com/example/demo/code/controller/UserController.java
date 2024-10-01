@@ -26,14 +26,11 @@ public class UserController {
         return "table/users";
     }
 
-    @GetMapping("/usersTableSave")
-    public String userTableSave() {
-        return "table/usersTableSave";
-    }
+
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") int id, Model model) {
-        model.addAttribute("users", userDAO.show(id));
+        model.addAttribute("user", userDAO.show(id));
         return "table/show";
 
     }
@@ -45,11 +42,33 @@ public class UserController {
     }
 
 
-    public String createUser(@ModelAttribute ("user")User user) {
+    @PostMapping("/users")
+    public String createUser(@ModelAttribute("user") User user) {
         userDAO.save(user);
-        return "redirect:/users";
+        return "redirect:/table/v1/users";
     }
 
+    // Удаление пользователя
+    @GetMapping("/delete/{id}")
+    public String deleteUser(@PathVariable("id") int id) {
+        userDAO.delete(id);
+        return "redirect:/table/v1/users"; // Перенаправляем на страницу со списком пользователей
+    }
+
+    // Отображение формы для изменения пользователя
+    @GetMapping("/edit/{id}")
+    public String editUser(@PathVariable("id") int id, Model model) {
+        User user = userDAO.show(id);
+        model.addAttribute("user", user);
+        return "table/editUser"; // Название страницы для редактирования
+    }
+
+    // Обработка изменения пользователя
+    @PostMapping("/edit")
+    public String updateUser(@ModelAttribute("user") User user) {
+        userDAO.update(user);
+        return "redirect:/table/v1/users"; // Перенаправляем на страницу со списком пользователей
+    }
 
 
 }
