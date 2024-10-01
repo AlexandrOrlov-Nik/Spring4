@@ -13,9 +13,9 @@ public class UserDAO {
 
     {
         users = new ArrayList<>();
-        users.add(new User(++USER_COUNT, "Tom"));
-        users.add(new User(++USER_COUNT, "Mel"));
-        users.add(new User(++USER_COUNT, "Sem"));
+        users.add(new User(++USER_COUNT, "Tom", "tom@mail.com"));
+        users.add(new User(++USER_COUNT, "Mel","mel@mail.com"));
+        users.add(new User(++USER_COUNT, "Sem","sem@mail.com"));
     }
     public List<User> userTable() {
         return users;
@@ -29,17 +29,18 @@ public class UserDAO {
         users.add(user);
     }
 
-    public void update(User user) {
-        for (User u : users) {
-            if (u.getId() == user.getId()) {
-                u.setName(user.getName());
-            break;
-            }
-        }
-    }
+    public void update(int id, User updatedUser) {
+        User userToBeUpdated = show(id);
 
+        userToBeUpdated.setName(updatedUser.getName());
+        userToBeUpdated.setEmail(updatedUser.getEmail());
+        }
 
     public void delete(int id) {
         users.removeIf(user -> user.getId() == id);
+
     }
 }
+
+
+

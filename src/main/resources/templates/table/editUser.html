@@ -12,11 +12,18 @@
   <label for="name">Enter name: </label>
   <input type="text" th:field="*{name}" id="name"/>
   <br/>
-  <input type="hidden" th:field="*{id}"/> <!-- Скрытое поле для ID -->
+  <label for="email">Enter email:</label>
+  <input type="text" th:field="*{email}" id="email"/>
+  <input type="hidden" th:field="*{id}"/>
+  <br/>
+  <hr/>
   <input type="submit" value="Update!"/>
 </form>
 
-<a href="/table/v1/users">Back to Users</a> <!-- Ссылка возврата -->
+<br/>
+<hr/>
+
+<a href="/table/v1/users">Back to Users</a>
 
 </body>
 </html>

@@ -9,10 +9,16 @@
 <h1>Table User</h1>
 
 <div th:each="user : ${users}">
-    <a th:href="@{/table/v1/{id}(id=${user.getId()})}" th:text="${user.getName()}">User</a>
-    <a th:href="@{/table/v1/edit/{id}(id=${user.getId()})}">Edit</a> <!-- Ссылка на редактирование -->
-    <a th:href="@{/table/v1/delete/{id}(id=${user.getId()})}" th:onclick="'return confirm(\'Are you sure?\');'">Delete</a> <!-- Ссылка на удаление с подтверждением -->
+    <a th:href="@{/table/v1/{id}(id=${user.getId()})}"
+       th:text="${user.getName() + ' (' + user.getEmail() + ')'}">User</a>
+    <br/>
+    <a th:href="@{/table/v1/edit/{id}(id=${user.getId()})}">Edit</a>
+    <a th:href="@{/table/v1/delete/{id}(id=${user.getId()})}"
+       th:onclick="'return confirm(\'Are you sure?\');'">Delete</a>
 </div>
+
+<br/>
+<hr/>
 
 <a href="/table/v1/newUser">New User</a>
 
