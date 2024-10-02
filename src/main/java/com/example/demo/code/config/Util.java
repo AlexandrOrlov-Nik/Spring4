@@ -1,59 +1,93 @@
 package com.example.demo.code.config;
 
 
-import com.example.demo.code.models.User;
-import org.hibernate.SessionFactory;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.service.ServiceRegistry;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.orm.hibernate5.HibernateTransactionManager;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.thymeleaf.spring6.SpringTemplateEngine;
+import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
 
-@org.springframework.context.annotation.Configuration
-public class Util {
+import javax.sql.DataSource;
+import java.util.Properties;
 
+@Configuration
+@PropertySource({})
+@EnableWebMvc
+@EnableTransactionManagement
+public class Util implements WebMvcConfigurer {
 
     private static final String URL = "jdbc:mysql://localhost:3306/my_database";
     private static final String USERNAME = "user";
     private static final String PASSWORD = "user_password";
+    private static final String DRIVER = "com.mysql.jdbc.Driver";
 
-    public static Connection getConnection() {
-        try{
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        }catch (ClassNotFoundException e){
-            e.printStackTrace();
-        }
-        Connection connection;
-        try {
-            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return connection;
+
+    @Bean
+    public SpringResourceTemplateResolver templateResolver() {
+        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
+        templateResolver.setPrefix("classpath:/templates/");
+        templateResolver.setSuffix(".html");
+        templateResolver.setTemplateMode("HTML5");
+        templateResolver.setCharacterEncoding("UTF-8");
+
+        return templateResolver;
+
+    }
+
+    @Bean
+    public SpringTemplateEngine templateEngine() {
+        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver());
+        templateEngine.setEnableSpringELCompiler(true);
+
+        return templateEngine;
     }
 
 
-    public static SessionFactory buildSessionFactory() {
-        try {
-            Configuration configuration = new Configuration();
-            configuration.addAnnotatedClass(User.class);
-            configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
-            configuration.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver");
-            configuration.setProperty("hibernate.connection.url", URL);
-            configuration.setProperty("hibernate.connection.username", USERNAME);
-            configuration.setProperty("hibernate.connection.password", PASSWORD);
-            configuration.setProperty("hibernate.hbm2ddl.auto", "update");
+    @Bean
+    public DataSource getDataSource() {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+        dataSource.setUrl(URL);
+        dataSource.setUsername(USERNAME);
+        dataSource.setPassword(PASSWORD);
+        dataSource.setDriverClassName(DRIVER);
 
-            ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
-                    .applySettings(configuration.getProperties()).build();
-            return configuration.buildSessionFactory(serviceRegistry);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new ExceptionInInitializerError("Initial SessionFactory creation failed" + ex);
-        }
+        return dataSource;
+    }
 
+
+    public Properties hibernateProperties() {
+        Properties properties = new Properties();
+        properties.put("hibernate.show_sql", "true");
+        properties.put("hibernate.format_sql", "true");
+
+        return properties;
+    }
+
+    @Bean
+    public LocalSessionFactoryBean sessionFactory() {
+        LocalSessionFactoryBean sessionFactoryBean = new LocalSessionFactoryBean();
+        sessionFactoryBean.setDataSource(getDataSource());
+        sessionFactoryBean.setHibernateProperties(hibernateProperties());
+
+        return sessionFactoryBean;
+    }
+
+    @Bean
+    public PlatformTransactionManager hibernateTransactionManager() {
+        HibernateTransactionManager transactionManager = new HibernateTransactionManager();
+        transactionManager.setSessionFactory(sessionFactory().getObject());
+
+        return transactionManager;
     }
 
 }

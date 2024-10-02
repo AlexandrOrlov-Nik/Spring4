@@ -4,8 +4,10 @@ package com.example.demo.code.controller;
 
 import com.example.demo.code.dao.UserDAO;
 import com.example.demo.code.models.User;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -43,7 +45,12 @@ public class UserController {
 
 
     @PostMapping("/users")
-    public String createUser(@ModelAttribute("user") User user) {
+    public String createUser(@ModelAttribute("user") @Valid User user,
+                             BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            return "table/newUser";
+
+
         userDAO.save(user);
         return "redirect:/table/v1/users";
     }
@@ -65,7 +72,12 @@ public class UserController {
 
 
     @PostMapping("/edit")
-    public String updateUser(@ModelAttribute("user") User user, @PathVariable("id") int id) {
+    public String updateUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult,
+                             @PathVariable("id") int id) {
+
+        if (bindingResult.hasErrors())
+            return "table/editUser";
+
         userDAO.update(id, user);
         return "redirect:/table/v1/users";
     }
