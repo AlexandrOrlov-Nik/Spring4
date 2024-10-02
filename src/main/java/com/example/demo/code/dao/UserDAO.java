@@ -58,9 +58,17 @@ public class UserDAO {
         User userToBeDeleted = session.get(User.class, id);
         session.delete(userToBeDeleted);
 
-
-
     }
+
+    @Transactional(readOnly = true)
+    public boolean existsByEmail(String email) {
+        Session session = sessionFactory.getCurrentSession();
+        Long count = (Long) session.createQuery("SELECT COUNT(u) FROM User u WHERE u.email = :email")
+                .setParameter("email", email)
+                .uniqueResult();
+        return count != null && count > 0;
+    }
+
 }
 
 

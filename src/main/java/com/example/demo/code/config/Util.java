@@ -2,9 +2,9 @@ package com.example.demo.code.config;
 
 
 
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
@@ -15,11 +15,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
 
+
 import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
-@PropertySource({})
 @EnableWebMvc
 @EnableTransactionManagement
 public class Util implements WebMvcConfigurer {
@@ -27,7 +27,7 @@ public class Util implements WebMvcConfigurer {
     private static final String URL = "jdbc:mysql://localhost:3306/my_database";
     private static final String USERNAME = "user";
     private static final String PASSWORD = "user_password";
-    private static final String DRIVER = "com.mysql.jdbc.Driver";
+    private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
 
 
     @Bean
@@ -35,7 +35,7 @@ public class Util implements WebMvcConfigurer {
         SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
         templateResolver.setPrefix("classpath:/templates/");
         templateResolver.setSuffix(".html");
-        templateResolver.setTemplateMode("HTML5");
+        templateResolver.setTemplateMode("HTML");
         templateResolver.setCharacterEncoding("UTF-8");
 
         return templateResolver;
@@ -55,7 +55,7 @@ public class Util implements WebMvcConfigurer {
     @Bean
     public DataSource getDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource.setUrl(URL);
         dataSource.setUsername(USERNAME);
         dataSource.setPassword(PASSWORD);
@@ -64,11 +64,14 @@ public class Util implements WebMvcConfigurer {
         return dataSource;
     }
 
-
+    @Bean
     public Properties hibernateProperties() {
         Properties properties = new Properties();
         properties.put("hibernate.show_sql", "true");
         properties.put("hibernate.format_sql", "true");
+        properties.put("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect");
+        properties.put("hibernate.hbm2ddl.auto", "update");
+
 
         return properties;
     }
