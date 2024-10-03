@@ -3,11 +3,16 @@ package com.example.demo.code.config;
 
 
 
+import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.JpaVendorAdapter;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -77,20 +82,24 @@ public class Util implements WebMvcConfigurer {
     }
 
     @Bean
-    public LocalSessionFactoryBean sessionFactory() {
-        LocalSessionFactoryBean sessionFactoryBean = new LocalSessionFactoryBean();
-        sessionFactoryBean.setDataSource(getDataSource());
-        sessionFactoryBean.setHibernateProperties(hibernateProperties());
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+        LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
+        em.setDataSource(getDataSource());
+        em.setPackagesToScan("com.example.demo.code.models"); // Укажите пакет, где находятся ваши сущности (Entity)
+        JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+        em.setJpaVendorAdapter(vendorAdapter);
+        em.setJpaProperties(hibernateProperties());
 
-        return sessionFactoryBean;
+        return em;
+
     }
 
     @Bean
-    public PlatformTransactionManager hibernateTransactionManager() {
-        HibernateTransactionManager transactionManager = new HibernateTransactionManager();
-        transactionManager.setSessionFactory(sessionFactory().getObject());
+    public PlatformTransactionManager platformTransactionManager() {
+        JpaTransactionManager manager = new JpaTransactionManager();
+        manager.setEntityManagerFactory(entityManagerFactory().getObject());
 
-        return transactionManager;
-    }
+        return manager;}
+
 
 }

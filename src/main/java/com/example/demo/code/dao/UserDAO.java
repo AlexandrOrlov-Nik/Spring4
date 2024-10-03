@@ -2,9 +2,9 @@ package com.example.demo.code.dao;
 
 import com.example.demo.code.models.User;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,60 +13,55 @@ import java.util.List;
 @Component
 public class UserDAO {
 
-    private final SessionFactory sessionFactory;
+    @PersistenceContext
+    private EntityManager entityManager;
 
-    @Autowired
-    public UserDAO(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
+
+
 
     @Transactional(readOnly = true)
     public List<User> userTable() {
-        Session session = sessionFactory.getCurrentSession();
+        List<User> resultList = entityManager.createQuery("SELECT u FROM User u", User.class).getResultList();
 
-        return session.createQuery("select p from User p", User.class)
-               .getResultList();
+        return resultList;
 
     }
 
     @Transactional(readOnly = true)
     public User show(int id) {
-        Session session = sessionFactory.getCurrentSession();
-        return session.get(User.class, id);
+        return entityManager.find(User.class, id);
+
     }
 
     @Transactional
     public void save(User user) {
-        Session session = sessionFactory.getCurrentSession();
-        session.saveOrUpdate(user);
+        entityManager.persist(user);
 
     }
 
     @Transactional
     public void update(int id, User updatedUser) {
-        Session session = sessionFactory.getCurrentSession();
-        User userToBeUpdate = session.get(User.class, id);
-        userToBeUpdate.setName(updatedUser.getName());
-        userToBeUpdate.setEmail(updatedUser.getEmail());
-        session.update(userToBeUpdate);
+        User user = entityManager.find(User.class, id);
+        user.setName(updatedUser.getName());
+        user.setEmail(updatedUser.getEmail());
+        entityManager.merge(user);
 
     }
 
     @Transactional
     public void delete(int id) {
-        Session session = sessionFactory.getCurrentSession();
-        User userToBeDeleted = session.get(User.class, id);
-        session.delete(userToBeDeleted);
+        User user = entityManager.find(User.class, id);
+        entityManager.remove(user);
 
     }
 
     @Transactional(readOnly = true)
     public boolean existsByEmail(String email) {
-        Session session = sessionFactory.getCurrentSession();
-        Long count = (Long) session.createQuery("SELECT COUNT(u) FROM User u WHERE u.email = :email")
+        Long count = entityManager.createQuery(
+                        "SELECT COUNT(u) FROM User u WHERE u.email = :email", Long.class)
                 .setParameter("email", email)
-                .uniqueResult();
-        return count != null && count > 0;
+                .getSingleResult();
+        return count > 0;
     }
 
 }
